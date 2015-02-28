@@ -1,0 +1,42 @@
+<link type="text/css" rel="stylesheet" href="assets/popup.css">
+<div class="container-100">
+  <h1 class="center">Sample Extension</h1>
+  <div class="offset-25 container-50">
+    <hr>
+    <h2 class="center" id="append">Store Data</h2>
+    <p class="center">You can save data in a key-value store that you can get back later.</p>
+    <form id="store-form">
+      <div class="form-group">
+        <label class="form-label inline" for="key">Key:</label>
+        <input class="form-input width-75 right inline" name="key" id="key">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label inline" for="value">Value:</label>
+        <input class="form-input width-75 right inline" name="value" id="value">
+      </div>
+
+      <div class="form-group center">
+        <button type="submit" class="blue-button button">Store</button>
+      </div>
+    </form>
+    <h2 class="center margin-top">Get Data</h2>
+    <p class="center">You access saved data by specifying a key.</p>
+    <form id="get-form">
+      <div class="form-group">
+        <label class="form-label inline" for="key">Key:</label>
+        <input class="form-input width-75 right inline" name="get-key" id="get-key">
+      </div>
+
+      <div class="form-group center">
+        <button type="submit" class="blue-button button">Get Value</button>
+      </div>
+    </form>
+    <button id="authorize-button" style="visibility: hidden">Authorize</button>
+    <button id="my-button">Execute</button>
+    <button id="sign-in-button">Sign In</button>
+  </div>
+</div>
+<script src="assets/jquery-1.10.1.min.js"></script>
+<script src="assets/client.js"></script>
+<script src="popup.js"></script>

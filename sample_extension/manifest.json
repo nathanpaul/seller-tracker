@@ -1,0 +1,19 @@
+{
+  "manifest_version": 2,
+
+  "name": "This is the extension I am using to learn how to build Chrome Extension.",
+  "description": "This extension will exercise various functionalities.",
+  "version": "1.0",
+
+  "browser_action": {
+    "default_icon": "icon.png",
+    "default_popup": "popup.html",
+    "default_title": "Super Test"
+  },
+  "content_security_policy": "script-src 'self' https://apis.google.com; object-src 'self'",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "https://ajax.googleapis.com/"
+  ]
+}

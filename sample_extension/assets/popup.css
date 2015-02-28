@@ -1,0 +1,133 @@
+body
+{
+  width: 500px;
+  height: 500px;
+  font-family: "Helvetica Neue";
+}
+
+.container-100
+{
+  width: 100%;
+}
+
+.container-50
+{
+  width: 50%;
+  display: inline-block;
+}
+
+.offset-75
+{
+  margin-left: 50%;
+  left: 0;
+}
+
+.offset-50
+{
+  margin-left: 50%;
+  left: 0;
+}
+
+.offset-25
+{
+  margin-left: 25%;
+  left: 0;
+}
+
+.width-100
+{
+  width: 100%;
+}
+
+.width-75
+{
+  width: 75%;
+}
+
+.width-50
+{
+  width: 50%;
+}
+
+.width-25
+{
+  width: 25%;
+}
+
+.inline
+{
+  display: inline;
+}
+
+.form-input
+{
+  position: absolute;
+}
+
+.center
+{
+  text-align: center;
+}
+
+.right
+{
+  right: 0 !important;
+}
+
+.margin-top
+{
+  margin-top: 30px;
+}
+
+.form-group
+{
+  position: relative;
+  margin-top: 15px;
+}
+
+.blue-button
+{
+}
+
+.button
+{
+  width: 50%;
+  border-radius: 0px !important
+}
+
+
+h1,
+h2,
+h3,
+p,
+label,
+input
+{
+  font-weight: 200;
+}
+
+h1
+{
+  font-size: 36px;
+}
+
+h2
+{
+  margin-bottom: -10px;
+}
+
+.save-alert
+{
+  border-color: #b2dba1;
+  border-radious: 0px;
+  background-color: #c8e5bc;
+}
+
+.alert-info
+{
+  padding: 5px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-weight: 200;
+  font-size: 16px;
+}
