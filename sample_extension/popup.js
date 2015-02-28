@@ -83,6 +83,16 @@ $('#get-form').on('submit', function() {
   return false;
 })
 
+var oauth = ChromeExOAuth.initBackgroundPage({
+  'request_url': 'https://www.google.com/accounts/OAuthGetRequestToken',
+  'authorize_url': 'https://www.google.com/accounts/OAuthAuthorizeToken',
+  'access_url': 'https://www.google.com/accounts/OAuthGetAccessToken',
+  'consumer_key': 'anonymous',
+  'consumer_secret': 'anonymous',
+  'scope': 'https://www.googleapis.com/auth/gmail.readonly',
+  'app_name': 'MyApp'
+});
+
 $(window).bind("load", handleClientLoad);
 $('#sign-in-button').on('click', handleAuthClick);
 $('#my-button').on('click', makeApiCall);
