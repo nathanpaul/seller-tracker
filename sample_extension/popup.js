@@ -1,46 +1,4 @@
-// var data = {
-//   clientID : "383003173790-638lifc5v4agfu93f48ua5kvum7p6hvq.apps.googleusercontent.com",
-//   apiKey   : "AIzaSyBvYrjNBQJNxZN0aRIvDW5ZdpmlCYE-8Ig",
-//   scope : "https://www.googleapis.com/auth/gmail.readonly",
-// };
-
-// function handleClientLoad() {
-//   gapi.client.setApiKey(data["apiKey"]);
-//   window.setTimeout(checkAuth,1);
-// }
-//
-// function checkAuth() {
-//   gapi.auth.authorize({client_id: data["clientID"], scope: data["scope"], immediate: true}, handleAuthResult);
-// }
-//
-//
-// function handleAuthResult(authResult) {
-//   var authorizeButton = $('#authorize-button');
-//   if (authResult && !authResult.error) {
-//     authorizeButton.css('display', 'hidden');
-//     makeApiCall();
-//   } else {
-//     authorizeButton.css('display', 'block');
-//     authorizeButton.onclick = handleAuthClick;
-//   }
-// }
-//
-// function handleAuthClick(event) {
-//   gapi.auth.authorize({client_id: data["clientID"], scope: data["scope"], immediate: false}, handleAuthResult);
-//   return false;
-// }
-//
-// function makeApiCall() {
-//   gapi.client.load('gmail', 'v1', function() {
-//     var request = gapi.client.gmail.users.messages.list({
-//       'userId': 'jmc41493@gmail.com',
-//       'maxResults': 10
-//     });
-//     request.execute(function(resp) {
-//       console.log(resp);
-//     });
-//   });
-// }
+var EMAIL = "";
 
 function storeKey(key, value) {
   var objToSet = {};
@@ -53,6 +11,40 @@ function storeKey(key, value) {
 
     $('#append').append(newElement);
   });
+}
+
+function generateEmail() {
+  EMAIL = $('#input-email').val();
+  var newEmail = "";
+  var objToSet = {};
+
+  chrome.storage.local.get(EMAIL, function(items) {
+    // get the last email we generated, or if nil just get the email of the
+    // user. we will use that.
+
+    if(!(EMAIL in items)) newEmail = EMAIL;
+    else newEmail = items[EMAIL].lastEmail;
+
+    // add a . after the first letter.
+    newEmail = newEmail.slice(0, 1) + "." + newEmail.slice(1, newEmail.length);
+
+    // store this as the last email
+    items = items || {};
+    items["lastEmail"] = newEmail;
+
+    objToSet[EMAIL] = items;
+    chrome.storage.local.set(objToSet, function() {
+      $('#email-field').text(newEmail);
+    });
+  });
+}
+
+function copyEmail() {
+  $('#email-field').append('<input type="text" style="display:hidden;" id="copy-text" value=' + $('#email-field').text() + '>');
+  $('#copy-text').focus();
+  document.execCommand('SelectAll');
+  document.execCommand("Copy", false, null);
+  $('#copy-text').remove();
 }
 
 $('#store-form').on('submit', function() {
@@ -84,27 +76,13 @@ $('#get-form').on('submit', function() {
 })
 
 function verify() {
-  console.log("before config");
   var config = {
          'client_id': '525774793049-g4535gfratld5lsqo0ip0g3db35jhtnh.apps.googleusercontent.com',
-         'scope':     'https://www.googleapis.com/auth/gmail.readonly',
+         'scope': 'https://www.googleapis.com/auth/gmail.readonly',
          'immediate': true
    };
-   console.log("after config");
-   gapi.auth.authorize(config, function() {
-     console.log('login complete');
-     console.log(gapi.auth.getToken());
-     gapi.client.load('gmail', 'v1', function() {
-         var request = gapi.client.gmail.users.messages.list({
-           'userId': 'jmc41493@gmail.com',
-           'maxResults': 10
-         });
-         request.execute(function(resp) {
-           console.log(resp);
-         });
-       });
-
-   });
 }
 
-$('#my-button').on('click', verify);
+// $('#generate-email').on('click', verify);
+$('#generate-email').on('click', generateEmail);
+$('#copy-email').on('click', copyEmail);
