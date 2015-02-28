@@ -1,18 +1,5 @@
 var EMAIL = "";
 
-function storeKey(key, value) {
-  var objToSet = {};
-  objToSet[key] = value;
-
-  chrome.storage.local.set(objToSet, function() {
-    var alertHtml = key + " : " + value + " was saved!";
-    var saveHtml = "<div class='save-alert center'><p class='alert-info'>" + alertHtml + "</p></div>";
-    var newElement = $(saveHtml)
-
-    $('#append').append(newElement);
-  });
-}
-
 function generateEmail() {
   EMAIL = $('#input-email').val();
   var newEmail = "";
@@ -21,9 +8,11 @@ function generateEmail() {
   chrome.storage.local.get(EMAIL, function(items) {
     // get the last email we generated, or if nil just get the email of the
     // user. we will use that.
-
     if(!(EMAIL in items)) newEmail = EMAIL;
-    else newEmail = items[EMAIL].lastEmail;
+    else {
+      newEmail = items[EMAIL].lastEmail;
+      items = items[EMAIL];
+    }
 
     // add a . after the first letter.
     newEmail = newEmail.slice(0, 1) + "." + newEmail.slice(1, newEmail.length);
@@ -32,10 +21,12 @@ function generateEmail() {
     items = items || {};
     items["lastEmail"] = newEmail;
 
-    objToSet[EMAIL] = items;
-    chrome.storage.local.set(objToSet, function() {
-      $('#email-field').text(newEmail);
-    });
+    // if items does not have anything in tracked emails
+    if(!("trackedEmails" in items)) items["trackedEmails"] = []
+
+    // add the new email to tracked emails
+    addToTrackedEmails(newEmail, EMAIL, items, storeTrackObject)
+    $('#email-field').text(newEmail);
   });
 }
 
@@ -47,33 +38,35 @@ function copyEmail() {
   $('#copy-text').remove();
 }
 
-$('#store-form').on('submit', function() {
-    var key, value;
-
-    if (typeof($('#key').val()) !== "undefined") key = $('#key').val();
-    if (typeof($('#value').val()) !== "undefined") value = $('#value').val();
-
-    storeKey(key, value);
-    $('#key, #value').val("");
-
-    return false;
-});
-
-$('#get-form').on('submit', function() {
-  var key, value;
-  if(typeof($('#get-key').val()) !== "undefined") {
-    key = $('#get-key').val();
-    chrome.storage.local.get(key, function(items) {
-      if($('#get-value').length < 1) {
-        $('#get-form').after("<h3 class='center inline'>Retrieved value: </div><p id='get-value' class='inline'>" + items[key] + "</p>");
-      }
-      else {
-        $('#get-value').text(items[key]);
-      }
-    })
+function addToTrackedEmails(emailToTrack, userEmail, items, callback) {
+  var queryInfo = {
+    active: true,
+    currentWindow: true
   }
-  return false;
-})
+
+  chrome.tabs.query(queryInfo, function(tabs) {
+    // get the page url
+    var pageTitle = tabs[0].url
+
+    // extract the company name from url
+
+    // replace the beginning of the url
+    pageTitle = pageTitle.replace(/(https\:\/\/www\.)|(http\:\/\/www\.)|(https:\/\/)|(http:\/\/)/, "");
+
+    // find the first occurrence of a . and then cut the rest of the string off
+    pageTitle = pageTitle.substring(0, pageTitle.indexOf('.'));
+
+    items["trackedEmails"].push({"email": emailToTrack, "site": pageTitle, "spam": 0, "track": true});
+
+    callback(items, EMAIL);
+  })
+}
+
+function storeTrackObject(items, EMAIL) {
+  var objToSet = {};
+  objToSet[EMAIL] = items;
+  chrome.storage.local.set(objToSet);
+}
 
 function verify() {
   var config = {
@@ -83,6 +76,5 @@ function verify() {
    };
 }
 
-// $('#generate-email').on('click', verify);
 $('#generate-email').on('click', generateEmail);
 $('#copy-email').on('click', copyEmail);
