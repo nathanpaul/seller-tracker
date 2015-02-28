@@ -1,9 +1,9 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
 
-  "name": "This is the extension I am using to learn how to build Chrome Extension.",
-  "description": "This extension will exercise various functionalities.",
-  "version": "1.0",
+  "name": "Sell Out!",
+  "description": "This extension keeps track of which websites sell your email address!",
+  "version": "0.9",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApiTRRYybViAE1ADwBtlwQ2rAHNh2ZzqLmvorcRNvR+HOoE14iwM0+D31HLyXz4SSEipCeT1dBc+ASQwQcF0MQpX9w/IXhBcPbDjSHNUJpziNDMkHuZkZ/kYquIHKtsdfhvsztcpqzntfUKBmAlKJWfIJttbN5CTRajG2dtoI2pLq3B8K36ReA4opF0nFXa0vmgHLg0qYNO2sONGzeAyISpSJOKTQmaM3tP4bNYhcxgb9vnNS4NvztdH/0XmNxU9TChhnYdeHMhEJpF20ix/APBlHnmT393nz7YvgTNpfx0HhRWnrJgnR8NhfUF9fXY/IpqcJu6QtNVgmgY9YMVIVLQIDAQAB",
 
   "browser_action": {
