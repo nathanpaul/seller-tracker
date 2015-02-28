@@ -4,6 +4,7 @@
   "name": "This is the extension I am using to learn how to build Chrome Extension.",
   "description": "This extension will exercise various functionalities.",
   "version": "1.0",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApiTRRYybViAE1ADwBtlwQ2rAHNh2ZzqLmvorcRNvR+HOoE14iwM0+D31HLyXz4SSEipCeT1dBc+ASQwQcF0MQpX9w/IXhBcPbDjSHNUJpziNDMkHuZkZ/kYquIHKtsdfhvsztcpqzntfUKBmAlKJWfIJttbN5CTRajG2dtoI2pLq3B8K36ReA4opF0nFXa0vmgHLg0qYNO2sONGzeAyISpSJOKTQmaM3tP4bNYhcxgb9vnNS4NvztdH/0XmNxU9TChhnYdeHMhEJpF20ix/APBlHnmT393nz7YvgTNpfx0HhRWnrJgnR8NhfUF9fXY/IpqcJu6QtNVgmgY9YMVIVLQIDAQAB",
 
   "browser_action": {
     "default_icon": "icon.png",
@@ -14,6 +15,21 @@
   "permissions": [
     "activeTab",
     "storage",
-    "https://ajax.googleapis.com/"
-  ]
+    "https://ajax.googleapis.com/",
+    "identity",
+    "tabs",
+    "https://docs.google.com/feeds/*",
+    "https://www.google.com/accounts/OAuthGetRequestToken",
+    "https://www.google.com/accounts/OAuthAuthorizeToken",
+    "https://www.google.com/accounts/OAuthGetAccessToken"
+  ],
+  /*"background": {
+    "page": "chrome_ex_oauth.html"
+  },*/
+  "oauth2": {
+    "client_id": "525774793049-g4535gfratld5lsqo0ip0g3db35jhtnh.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/gmail.readonly"
+    ]
+  }
 }
