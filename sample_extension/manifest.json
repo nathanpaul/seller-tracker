@@ -17,15 +17,15 @@
     "storage",
     "https://ajax.googleapis.com/",
     "identity",
-    "tabs", 
+    "tabs",
     "https://docs.google.com/feeds/*",
     "https://www.google.com/accounts/OAuthGetRequestToken",
     "https://www.google.com/accounts/OAuthAuthorizeToken",
     "https://www.google.com/accounts/OAuthGetAccessToken"
   ],
-  "background": {
+  /*"background": {
     "page": "chrome_ex_oauth.html"
-  },
+  },*/
   "oauth2": {
     "client_id": "525774793049-g4535gfratld5lsqo0ip0g3db35jhtnh.apps.googleusercontent.com",
     "scopes": [
