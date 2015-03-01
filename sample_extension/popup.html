@@ -1,11 +1,10 @@
 <link type="text/css" rel="stylesheet" href="assets/popup.css">
 <div class="container-100">
-  <h1 class="center">Spammer Tracker</h1>
+  <h1 class="center title">Sell Out</h1>
   <div class="offset-25 container-50">
     <hr>
   </div>
   <div class="offset-10 container-80">
-
     <h2 class="center" id="append">Generate New Email</h2>
     <p class="center">Specify a gmail address you would like to use to track spam.</p>
     <div class="center">
@@ -17,8 +16,11 @@
 
     <div class="margin-top left-spacing">
       <p class="center">Copy the new email address and use it to register.</p>
-      <p id="email-field" class="generated-email generated-email-para inline-block">Generate an email</p>
+      <input id="email-field" readonly=true class="generated-email generated-email-para inline-block" value="Generate an email">
       <button id="copy-email" class="generated-email generated-email-button inline-block">Copy</button>
+    </div>
+    <div class="center">
+      <span>Copied!</span>
     </div>
   </div>
 </div>
