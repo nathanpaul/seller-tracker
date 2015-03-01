@@ -221,12 +221,13 @@ function checkSpam()
               //console.log(resp);
               var site_re = new RegExp('.*?' + site + '.*?');
               //console.log('.*?' + site + '.*?');
-              console.log(items[key]['trackedEmails'][email]['spam']);
-              items[key]["trackedEmails"][email]['spam'] = 0;
+              //console.log(items[key]['trackedEmails'][email]['spam']);
+              
               if(resp['resultSizeEstimate'] != 0)
               {
                 var N = resp['resultSizeEstimate'];
                 console.log(N);
+                //items[key]["trackedEmails"][email]['spam'] = 0;
                 for(var x = 0; x < N; x++)
                 {
                   var thisMessage = resp['messages'][x]['id'];
@@ -235,20 +236,27 @@ function checkSpam()
                     'id': thisMessage
                   });
                   request.execute(function(resp2){
-                    console.log(resp2);
+                    //console.log(resp2);
                     siteFrom = resp2['payload']['headers'][8];
+                    for(var y = 0; y < 11; y++)
+                    {
+                      if(resp2['payload']['headers'][y]['name'] == 'From')
+                      {
+                        break;
+                      }
+                    }
+                    var siteFrom = resp2['payload']['headers'][y]['value'];
                     if(site_re.test(siteFrom))
                     {
                       console.log('boom'); //shitty original test code.
                       //shouldn't do anything.
-
                     }
                     else
                     {
                       console.log('blah'); //shitty original test code.
                       spamNum = spamNum + 1; // update it in place. This requests run asynchronously.
                       var newObj = {};
-                      items[key]["trackedEmails"][email]["spam"] += 1
+                      //items[key]["trackedEmails"][email]["spam"] += 1
                       newObj[key] = items[key];
                       chrome.storage.local.set(newObj[key]);
                       console.log(newObj);
