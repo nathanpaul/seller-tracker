@@ -26,16 +26,16 @@ function generateEmail() {
 
     // add the new email to tracked emails
     addToTrackedEmails(newEmail, EMAIL, items, storeTrackObject)
-    $('#email-field').text(newEmail);
+    $('#email-field').val(newEmail);
   });
 }
 
 function copyEmail() {
-  $('#email-field').append('<input type="text" style="display:hidden;" id="copy-text" value=' + $('#email-field').text() + '>');
-  $('#copy-text').focus();
+  $('#email-field').focus();
   document.execCommand('SelectAll');
   document.execCommand("Copy", false, null);
-  $('#copy-text').remove();
+  $('span').css('display', 'block');
+  $('span').fadeOut(3000);
 }
 
 function addToTrackedEmails(emailToTrack, userEmail, items, callback) {
