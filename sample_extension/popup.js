@@ -39,6 +39,9 @@ function formatOptionsPage() {
     }
     else {
       $('#options-table').css('display', 'block');
+      if($('#track-alert').length > 0) {
+        $('#track-alert').remove();
+      }
       formatOptionsTable(items);
     }
   });
@@ -189,28 +192,96 @@ function storeTrackObject(items, EMAIL) {
   chrome.storage.local.set(objToSet);
 }
 
+// function updateForEmail(key, data) {
+//   // get length from items[key] and do the tracking stuff.
+//   var emails = data['trackedEmails'];
+//   for(email in emails)
+//   {
+//     if(emails[email]['track']) // obeying the checkbox shit.
+//     {
+//       var site = emails[email]['site'];
+//       var spamNum = emails[email]['spam'];
+//       var emailTrack = emails[email]['email'];
+//
+//       var request = gapi.client.gmail.users.messages.list({
+//         'userId': 'me',
+//         'includeSpamTrash': true,
+//         'q': 'to:' + emailTrack // BALLER THIS WORKS.
+//       });
+//       request.execute(function(resp){
+//         //console.log(emailTrack);
+//         //console.log(resp);
+//         var site_re = new RegExp('.*?' + site + '.*?');
+//         //console.log('.*?' + site + '.*?');
+//         //console.log(items[key]['trackedEmails'][email]['spam']);
+//
+//         if(resp['resultSizeEstimate'] != 0)
+//         {
+//           var N = resp['resultSizeEstimate'];
+//           items[key]["trackedEmails"][email]['spam'] = 0;
+//           for(var x = 0; x < N; x++)
+//           {
+//             var thisMessage = resp['messages'][x]['id'];
+//             var request = gapi.client.gmail.users.messages.get({
+//               'userId': 'me',
+//               'id': thisMessage
+//             });
+//             request.execute(function(resp2){
+//               //console.log(resp2);
+//               siteFrom = resp2['payload']['headers'][8];
+//               for(var y = 0; y < 11; y++)
+//               {
+//                 if(resp2['payload']['headers'][y]['name'] == 'From')
+//                 {
+//                   break;
+//                 }
+//               }
+//               var siteFrom = resp2['payload']['headers'][y]['value'];
+//               //console.log(siteFrom);
+//               if(site_re.test(siteFrom))
+//               {
+//                 console.log('boom'); //shitty original test code.
+//                 //shouldn't do anything.
+//               }
+//               else
+//               {
+//                 spamNum = spamNum + 1; // update it in place. This requests run asynchronously.
+//                 var newObj = {};
+//                 items[key]["trackedEmails"][email]["spam"] += 1
+//                 //items['trackedEmails'].push({'email': emailTrack, 'site': site, 'spam': spamNum})
+//                 newObj[key] = items[key];
+//                 chrome.storage.local.set(newObj,function(){
+//                   console.log('pls');
+//                 });
+//               }
+//             });
+//           }
+//         }
+//       });
+//     }
+//   }
+// }
+
 function checkSpam()
 {
   var config = {
-         'client_id': '525774793049-g4535gfratld5lsqo0ip0g3db35jhtnh.apps.googleusercontent.com',
-         'scope': 'https://www.googleapis.com/auth/gmail.readonly',
-         'immediate': true
-   };
+    'client_id': '525774793049-g4535gfratld5lsqo0ip0g3db35jhtnh.apps.googleusercontent.com',
+    'scope': 'https://www.googleapis.com/auth/gmail.readonly',
+    'immediate': true
+  };
   gapi.client.load('gmail', 'v1', function() {
     chrome.storage.local.get(null, function(items) {
-      console.log("my items");
-      console.log(items);
+      // var blocked = false;
       for(key in items)
       {
-        // console.log(items[key]);
-        // get length from items[key] and do the tracking stuff.
+        // updateForEmail(key, items[key]);
         var emails = items[key]['trackedEmails'];
         for(email in emails)
         {
           if(emails[email]['track']) // obeying the checkbox shit.
           {
             var site = emails[email]['site'];
-            var spamNum = emails[email]['spam'];
+            var spamNum = 0;
             var emailTrack = emails[email]['email'];
 
             var request = gapi.client.gmail.users.messages.list({
@@ -228,7 +299,6 @@ function checkSpam()
               if(resp['resultSizeEstimate'] != 0)
               {
                 var N = resp['resultSizeEstimate'];
-                console.log(N);
                 items[key]["trackedEmails"][email]['spam'] = 0;
                 for(var x = 0; x < N; x++)
                 {
@@ -256,21 +326,19 @@ function checkSpam()
                     }
                     else
                     {
-                      console.log(siteFrom);
-                      //items["trackedEmails"].push({"email": emailToTrack, "site": pageTitle, "spam": 0, "track": true});
-                      console.log('blah'); //shitty original test code.
                       spamNum = spamNum + 1; // update it in place. This requests run asynchronously.
                       var newObj = {};
-                      console.log("spam num");
-                      console.log(spamNum);
                       items[key]["trackedEmails"][email]["spam"] += 1
                       //items['trackedEmails'].push({'email': emailTrack, 'site': site, 'spam': spamNum})
                       newObj[key] = items[key];
-                      console.log("KEY: " + key);
+                      // while(blocked) {
+                      // }
+                      // blocked = true;
                       chrome.storage.local.set(newObj,function(){
                         console.log('pls');
+                        // console.log('unblocking');
+                        // blocked = false;
                       });
-                      console.log(newObj);
                     }
                   });
                 }
@@ -285,20 +353,21 @@ function checkSpam()
 
 function verify() {
   var config = {
-         'client_id': '525774793049-g4535gfratld5lsqo0ip0g3db35jhtnh.apps.googleusercontent.com',
-         'scope': 'https://www.googleapis.com/auth/gmail.readonly',
-         'immediate': true
-   };
-   //console.log('verify');
-   gapi.auth.authorize(config, function() {
-     console.log('login complete');
-     console.log(gapi.auth.getToken());
-     checkSpam();
-   });
+    'client_id': '525774793049-g4535gfratld5lsqo0ip0g3db35jhtnh.apps.googleusercontent.com',
+    'scope': 'https://www.googleapis.com/auth/gmail.readonly',
+    'immediate': true
+  };
+  //console.log('verify');
+  gapi.auth.authorize(config, function() {
+    console.log('login complete');
+    console.log(gapi.auth.getToken());
+    checkSpam();
+  });
 }
 
 $('#generate-email').on('click', generateEmail);
 $('#copy-email').on('click', copyEmail);
 $('#track').on('click', goToTrack);
 $('#options').on('click', goToOptions);
+
 setTimeout(verify, 5000);
