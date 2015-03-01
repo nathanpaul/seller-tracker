@@ -198,9 +198,11 @@ function checkSpam()
    };
   gapi.client.load('gmail', 'v1', function() {
     chrome.storage.local.get(null, function(items) {
+      console.log("my items");
+      console.log(items);
       for(key in items)
       {
-        //console.log(items[key]);
+        // console.log(items[key]);
         // get length from items[key] and do the tracking stuff.
         var emails = items[key]['trackedEmails'];
         for(email in emails)
@@ -222,12 +224,12 @@ function checkSpam()
               var site_re = new RegExp('.*?' + site + '.*?');
               //console.log('.*?' + site + '.*?');
               //console.log(items[key]['trackedEmails'][email]['spam']);
-              
+
               if(resp['resultSizeEstimate'] != 0)
               {
                 var N = resp['resultSizeEstimate'];
                 console.log(N);
-                //items[key]["trackedEmails"][email]['spam'] = 0;
+                items[key]["trackedEmails"][email]['spam'] = 0;
                 for(var x = 0; x < N; x++)
                 {
                   var thisMessage = resp['messages'][x]['id'];
@@ -254,13 +256,17 @@ function checkSpam()
                     }
                     else
                     {
+                      console.log(siteFrom);
                       //items["trackedEmails"].push({"email": emailToTrack, "site": pageTitle, "spam": 0, "track": true});
                       console.log('blah'); //shitty original test code.
                       spamNum = spamNum + 1; // update it in place. This requests run asynchronously.
                       var newObj = {};
-                      //items[key]["trackedEmails"][email]["spam"] += 1
+                      console.log("spam num");
+                      console.log(spamNum);
+                      items[key]["trackedEmails"][email]["spam"] += 1
                       //items['trackedEmails'].push({'email': emailTrack, 'site': site, 'spam': spamNum})
                       newObj[key] = items[key];
+                      console.log("KEY: " + key);
                       chrome.storage.local.set(newObj,function(){
                         console.log('pls');
                       });
