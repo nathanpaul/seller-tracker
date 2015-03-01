@@ -246,6 +246,7 @@ function checkSpam()
                       }
                     }
                     var siteFrom = resp2['payload']['headers'][y]['value'];
+                    //console.log(siteFrom);
                     if(site_re.test(siteFrom))
                     {
                       console.log('boom'); //shitty original test code.
@@ -253,12 +254,16 @@ function checkSpam()
                     }
                     else
                     {
+                      //items["trackedEmails"].push({"email": emailToTrack, "site": pageTitle, "spam": 0, "track": true});
                       console.log('blah'); //shitty original test code.
                       spamNum = spamNum + 1; // update it in place. This requests run asynchronously.
                       var newObj = {};
                       //items[key]["trackedEmails"][email]["spam"] += 1
+                      //items['trackedEmails'].push({'email': emailTrack, 'site': site, 'spam': spamNum})
                       newObj[key] = items[key];
-                      chrome.storage.local.set(newObj[key]);
+                      chrome.storage.local.set(newObj,function(){
+                        console.log('pls');
+                      });
                       console.log(newObj);
                     }
                   });
