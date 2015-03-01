@@ -7,6 +7,7 @@ body
 {
   width: 500px;
   height: 374px;
+  max-height: 374px;
   font-family: "Helvetica Neue";
 }
 
@@ -95,7 +96,9 @@ body
   position: absolute;
 }
 
-.center
+.center,
+td,
+th
 {
   text-align: center;
 }
@@ -181,11 +184,17 @@ h2,
 h3,
 p,
 label,
-input,
 button,
-span
+span,
+th,
+td
 {
   font-weight: 200;
+}
+
+input
+{
+  font-weight: 300;
 }
 
 h1
@@ -198,7 +207,8 @@ h2
   margin-bottom: -10px;
 }
 
-#email-field
+#email-field,
+td
 {
   overflow-x: hidden;
 }
@@ -224,4 +234,94 @@ span
   padding-bottom: 10px;
   font-weight: 200;
   font-size: 16px;
+}
+
+.nav
+{
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+ul
+{
+  padding-left: 10px;
+  list-style: none;
+}
+
+li
+{
+  padding: 5px;
+}
+
+a
+{
+  padding: 5px;
+  font-size: 16px;
+  font-weight: 200;
+  color: rgb(92, 158, 213);
+  -webkit-transition: all 0.2s ease;
+  -moz-transition: all 0.2s ease;
+  transition: all 0.2s ease;
+}
+
+a:hover
+{
+  color: white;
+  background-color: rgb(92, 158, 213);
+  border: 1px solid rgb(92, 158, 213);
+  border-radius: 2px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.active
+{
+  color: white;
+  background-color: rgb(92, 158, 213);
+  border: 1px solid rgb(92, 158, 213);
+  border-radius: 2px;
+}
+
+#options-content
+{
+  display:none;
+}
+
+.info
+{
+  font-size: 18px;
+  border: solid 1px rgb(92, 158, 213);
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background-color: rgba(92, 158, 213, 0.62);
+  color: white;
+}
+
+table
+{
+  width: 100%;
+  max-height: 250px;
+  overflow: scroll;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+thead
+{
+  border-bottom: 1px solid black;
+}
+
+th
+{
+  padding-bottom: 7px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+td
+{
+  overflow-x: scroll;
+  padding-bottom: 5px;
+  padding-top: 5px;
 }

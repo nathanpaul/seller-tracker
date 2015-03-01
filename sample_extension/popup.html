@@ -1,10 +1,16 @@
 <link type="text/css" rel="stylesheet" href="assets/popup.css">
 <div class="container-100">
   <h1 class="center title">Sell Out</h1>
+  <div class="nav">
+    <ul>
+      <li><a class="active" id="track">Track Email</a></li>
+      <li><a id="options">Options</a></li>
+    </ul>
+  </div>
   <div class="offset-25 container-50">
     <hr>
   </div>
-  <div class="offset-10 container-80">
+  <div id="generate-content" class="offset-10 container-80">
     <h2 class="center" id="append">Generate New Email</h2>
     <p class="center">Specify a gmail address you would like to use to track spam.</p>
     <div class="center">
@@ -22,6 +28,23 @@
     <div class="center">
       <span>Copied!</span>
     </div>
+  </div>
+
+  <div id="options-content" class="offset-10 container-80">
+    <h2 class="center">Tracking Options</h2>
+    <p class="center">View the addresses being tracked, untrack them, or see who has sold your email.</p>
+    <table id="options-table">
+      <thead>
+        <tr>
+          <th>Site</th>
+          <th>Email</th>
+          <th>Spam</th>
+          <th>Track</th>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+      </tbody>
+    </table>
   </div>
 </div>
 <script src="assets/jquery-1.10.1.min.js"></script>

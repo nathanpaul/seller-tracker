@@ -1,4 +1,120 @@
 var EMAIL = "";
+var ACTIVE = 0;
+function goToOptions() {
+  if(ACTIVE == 0) {
+    $('#options').toggleClass('active');
+    $('#track').toggleClass('active');
+    $('#generate-content').fadeOut(500, function() {
+      $('#options-content').fadeIn(500);
+      ACTIVE = 1;
+      formatOptionsPage();
+    });
+  }
+}
+
+function goToTrack() {
+  if(ACTIVE == 1) {
+    $('#track').toggleClass('active');
+    $('#options').toggleClass('active');
+    $('#options-content').fadeOut(500, function() {
+      $('#generate-content').fadeIn(500);
+      $('#table-body').empty();
+      ACTIVE = 0;
+      $("html").css('width', '500px');
+      $("html").css('height', '374px');
+    });
+  }
+}
+
+function formatOptionsPage() {
+  // get the entire contents of storage
+  chrome.storage.local.get(null, function(items) {
+
+    // if there are no items in storage, display a message
+    if(isEmptyObject(items)) {
+      if($('#track-alert').length <= 0) $('#options-table').after("<p id='track-alert' class='info center'>You are currently not tracking any emails.</p>");
+      $('#options-table').css('display', 'none');
+    }
+    else {
+      $('#options-table').css('display', 'block');
+      formatOptionsTable(items);
+    }
+  });
+}
+
+function formatOptionsTable(items) {
+  var rowId = 0
+  var keyId = 0
+  var withinKey = 0
+  for(key in items) {
+    var data = items[key];
+    for(row in data["trackedEmails"]) {
+      if($('#row' + rowId).length <= 0) {
+        $('#table-body').append(createRowFromData(data["trackedEmails"][row], rowId, keyId, withinKey));
+      }
+      withinKey += 1;
+      rowId += 1;
+    }
+    withinKey = 0;
+    keyId += 1;
+  }
+  $('.trackbox').prop('checked', true).change(untrackEmail);
+  $('.trackbox').each(function() {
+    $(this).prop('checked', $(this).data('check'));
+  });
+}
+
+function createRowFromData(data, number, keyNumber, inKeyNumber) {
+  var checkbox = "";
+  if(data["track"]) {
+    checkbox = "<input type='checkbox' class='trackbox' data-check=" + data["track"] + ">";
+  }
+  else {
+    checkbox = "<input type='checkbox' class='trackbox' data-check=" + data["track"] + ">";
+  }
+
+  var row = "<tr class='datarow' data-inkey=" + inKeyNumber + " data-keynum=" + keyNumber + " id=row" + number +"><td>"+ data["site"] + "</td><td>" + data["email"] + "</td><td>" + data["spam"] + "</td><td>" + checkbox + "</td></tr>";
+  return row;
+}
+
+function isEmptyObject(obj) {
+  for(var prop in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, prop)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function untrackEmail() {
+  var nearestObj = $(this).closest(".datarow");
+  var key = nearestObj.data("keynum");
+  var inkey = nearestObj.data("inkey");
+  chrome.storage.local.get(null, function(items) {
+    var counter = 0;
+    for(keyp in items) {
+      if(counter == key) {
+        var data = items[keyp];
+        var incounter = 0;
+        for(row in data["trackedEmails"]) {
+          if(incounter == inkey) {
+            if(data["trackedEmails"][incounter]["track"]) {
+              data["trackedEmails"][incounter]["track"] = false;
+            }
+            else {
+              data["trackedEmails"][incounter]["track"] = true;
+            }
+            var newObjToSet = {};
+            newObjToSet[keyp] = data;
+            chrome.storage.local.set(newObjToSet);
+          }
+          incounter += 1;
+        }
+      }
+      counter += 1;
+    }
+  });
+}
 
 function generateEmail() {
   EMAIL = $('#input-email').val();
@@ -73,13 +189,13 @@ function checkSpam()
   gapi.client.load('gmail', 'v1', function(){
     var keysValues = [];
     chrome.storage.local.get(null, function(items){
-      //iterate on the keys. 
+      //iterate on the keys.
       for(key in items)
       {
         console.log(key);
         if(key != " ")
         {
-            var request = gapi.client.gmail.users.messages.list({
+          var request = gapi.client.gmail.users.messages.list({
             'userId': 'me',
             'q': key
           })
@@ -112,7 +228,7 @@ function checkSpam()
         }
       }
     });
-    // iterate on the keys. 
+    // iterate on the keys.
   });
 }
 
@@ -124,11 +240,13 @@ function verify() {
    };
    console.log('verify');
    gapi.auth.authorize(config, function() {
-   console.log('login complete');
-   console.log(gapi.auth.getToken());
-   checkSpam();
- });
+     console.log('login complete');
+     console.log(gapi.auth.getToken());
+     checkSpam();
+   });
 }
 
 $('#generate-email').on('click', generateEmail);
 $('#copy-email').on('click', copyEmail);
+$('#track').on('click', goToTrack);
+$('#options').on('click', goToOptions);
