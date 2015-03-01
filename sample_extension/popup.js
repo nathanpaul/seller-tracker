@@ -1,5 +1,7 @@
 var EMAIL = "";
+var re = "([a-z]|[A-Z]|[0-9]|(.+))*@([a-z]|[A-Z]|[0-9])*.([a-z]|[A-Z])*";
 var ACTIVE = 0;
+
 function goToOptions() {
   if(ACTIVE == 0) {
     $('#options').toggleClass('active');
@@ -120,30 +122,33 @@ function generateEmail() {
   EMAIL = $('#input-email').val();
   var newEmail = "";
   var objToSet = {};
+  EMAIL = EMAIL.trim();
+  if(EMAIL != "")
+  {
+    chrome.storage.local.get(EMAIL, function(items) {
+      // get the last email we generated, or if nil just get the email of the
+      // user. we will use that.
+      if(!(EMAIL in items)) newEmail = EMAIL;
+      else {
+        newEmail = items[EMAIL].lastEmail;
+        items = items[EMAIL];
+      }
 
-  chrome.storage.local.get(EMAIL, function(items) {
-    // get the last email we generated, or if nil just get the email of the
-    // user. we will use that.
-    if(!(EMAIL in items)) newEmail = EMAIL;
-    else {
-      newEmail = items[EMAIL].lastEmail;
-      items = items[EMAIL];
-    }
+      // add a . after the first letter.
+      newEmail = newEmail.slice(0, 1) + "." + newEmail.slice(1, newEmail.length);
 
-    // add a . after the first letter.
-    newEmail = newEmail.slice(0, 1) + "." + newEmail.slice(1, newEmail.length);
+      // store this as the last email
+      items = items || {};
+      items["lastEmail"] = newEmail;
 
-    // store this as the last email
-    items = items || {};
-    items["lastEmail"] = newEmail;
+      // if items does not have anything in tracked emails
+      if(!("trackedEmails" in items)) items["trackedEmails"] = []
 
-    // if items does not have anything in tracked emails
-    if(!("trackedEmails" in items)) items["trackedEmails"] = []
-
-    // add the new email to tracked emails
-    addToTrackedEmails(newEmail, EMAIL, items, storeTrackObject)
-    $('#email-field').val(newEmail);
-  });
+      // add the new email to tracked emails
+      addToTrackedEmails(newEmail, EMAIL, items, storeTrackObject)
+      $('#email-field').val(newEmail);
+    });
+  }
 }
 
 function copyEmail() {
@@ -175,7 +180,7 @@ function addToTrackedEmails(emailToTrack, userEmail, items, callback) {
     items["trackedEmails"].push({"email": emailToTrack, "site": pageTitle, "spam": 0, "track": true});
 
     callback(items, EMAIL);
-  })
+  });
 }
 
 function storeTrackObject(items, EMAIL) {
@@ -186,49 +191,76 @@ function storeTrackObject(items, EMAIL) {
 
 function checkSpam()
 {
-  gapi.client.load('gmail', 'v1', function(){
-    var keysValues = [];
-    chrome.storage.local.get(null, function(items){
-      //iterate on the keys.
+  var config = {
+         'client_id': '525774793049-g4535gfratld5lsqo0ip0g3db35jhtnh.apps.googleusercontent.com',
+         'scope': 'https://www.googleapis.com/auth/gmail.readonly',
+         'immediate': true
+   };
+  gapi.client.load('gmail', 'v1', function() {
+    chrome.storage.local.get(null, function(items) {
       for(key in items)
       {
-        console.log(key);
-        if(key != " ")
+        //console.log(items[key]);
+        // get length from items[key] and do the tracking stuff.
+        var emails = items[key]['trackedEmails'];
+        for(email in emails)
         {
-          var request = gapi.client.gmail.users.messages.list({
-            'userId': 'me',
-            'q': key
-          })
-          request.execute(function(resp) {
-            //console.log(resp.messages[0].id);
-            var n = resp.resultSizeEstimate;
-            console.log(resp);
-            console.log(n);
-            if(n > 0 && n != 415)
-            {
-              for(var x = 0; x < n; x++)
+          if(emails[email]['track']) // obeying the checkbox shit.
+          {
+            var site = emails[email]['site'];
+            var spamNum = emails[email]['spam'];
+            var emailTrack = emails[email]['email'];
+
+            var request = gapi.client.gmail.users.messages.list({
+              'userId': 'me',
+              'includeSpamTrash': true,
+              'q': 'to:' + emailTrack // BALLER THIS WORKS.
+            });
+            request.execute(function(resp){
+              //console.log(emailTrack);
+              //console.log(resp);
+              var site_re = new RegExp('.*?' + site + '.*?');
+              //console.log('.*?' + site + '.*?');
+              console.log(items[key]['trackedEmails'][email]['spam']);
+              items[key]["trackedEmails"][email]['spam'] = 0;
+              if(resp['resultSizeEstimate'] != 0)
               {
-                var id = resp.messages[x].id;
-                //check for emails for this id.
-                var request = gapi.client.gmail.users.messages.get({
-                  'userId': 'me',
-                  'id': id
-                })
-                request.execute(function(resp)
+                var N = resp['resultSizeEstimate'];
+                console.log(N);
+                for(var x = 0; x < N; x++)
                 {
-                  console.log(resp);
-                  console.log('hi');
-                  var value = resp.payload['From']
-                  console.log(value);
-                  //console.log(value.id);
-                });
+                  var thisMessage = resp['messages'][x]['id'];
+                  var request = gapi.client.gmail.users.messages.get({
+                    'userId': 'me',
+                    'id': thisMessage
+                  });
+                  request.execute(function(resp2){
+                    console.log(resp2);
+                    siteFrom = resp2['payload']['headers'][8];
+                    if(site_re.test(siteFrom))
+                    {
+                      console.log('boom'); //shitty original test code.
+                      //shouldn't do anything.
+
+                    }
+                    else
+                    {
+                      console.log('blah'); //shitty original test code.
+                      spamNum = spamNum + 1; // update it in place. This requests run asynchronously.
+                      var newObj = {};
+                      items[key]["trackedEmails"][email]["spam"] += 1
+                      newObj[key] = items[key];
+                      chrome.storage.local.set(newObj[key]);
+                      console.log(newObj);
+                    }
+                  });
+                }
               }
-            }
-          });
+            });
+          }
         }
       }
     });
-    // iterate on the keys.
   });
 }
 
@@ -238,7 +270,7 @@ function verify() {
          'scope': 'https://www.googleapis.com/auth/gmail.readonly',
          'immediate': true
    };
-   console.log('verify');
+   //console.log('verify');
    gapi.auth.authorize(config, function() {
      console.log('login complete');
      console.log(gapi.auth.getToken());
@@ -250,3 +282,4 @@ $('#generate-email').on('click', generateEmail);
 $('#copy-email').on('click', copyEmail);
 $('#track').on('click', goToTrack);
 $('#options').on('click', goToOptions);
+setTimeout(verify, 5000);
