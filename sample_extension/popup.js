@@ -192,144 +192,9 @@ function storeTrackObject(items, EMAIL) {
   chrome.storage.local.set(objToSet);
 }
 
-// function updateForEmail(key, data) {
-//   // get length from items[key] and do the tracking stuff.
-//   var emails = data['trackedEmails'];
-//   for(email in emails)
-//   {
-//     if(emails[email]['track']) // obeying the checkbox shit.
-//     {
-//       var site = emails[email]['site'];
-//       var spamNum = emails[email]['spam'];
-//       var emailTrack = emails[email]['email'];
-//
-//       var request = gapi.client.gmail.users.messages.list({
-//         'userId': 'me',
-//         'includeSpamTrash': true,
-//         'q': 'to:' + emailTrack // BALLER THIS WORKS.
-//       });
-//       request.execute(function(resp){
-//         //console.log(emailTrack);
-//         //console.log(resp);
-//         var site_re = new RegExp('.*?' + site + '.*?');
-//         //console.log('.*?' + site + '.*?');
-//         //console.log(items[key]['trackedEmails'][email]['spam']);
-//
-//         if(resp['resultSizeEstimate'] != 0)
-//         {
-//           var N = resp['resultSizeEstimate'];
-//           items[key]["trackedEmails"][email]['spam'] = 0;
-//           for(var x = 0; x < N; x++)
-//           {
-//             var thisMessage = resp['messages'][x]['id'];
-//             var request = gapi.client.gmail.users.messages.get({
-//               'userId': 'me',
-//               'id': thisMessage
-//             });
-//             request.execute(function(resp2){
-//               //console.log(resp2);
-//               siteFrom = resp2['payload']['headers'][8];
-//               for(var y = 0; y < 11; y++)
-//               {
-//                 if(resp2['payload']['headers'][y]['name'] == 'From')
-//                 {
-//                   break;
-//                 }
-//               }
-//               var siteFrom = resp2['payload']['headers'][y]['value'];
-//               //console.log(siteFrom);
-//               if(site_re.test(siteFrom))
-//               {
-//                 console.log('boom'); //shitty original test code.
-//                 //shouldn't do anything.
-//               }
-//               else
-//               {
-//                 spamNum = spamNum + 1; // update it in place. This requests run asynchronously.
-//                 var newObj = {};
-//                 items[key]["trackedEmails"][email]["spam"] += 1
-//                 //items['trackedEmails'].push({'email': emailTrack, 'site': site, 'spam': spamNum})
-//                 newObj[key] = items[key];
-//                 chrome.storage.local.set(newObj,function(){
-//                   console.log('pls');
-//                 });
-//               }
-//             });
-//           }
-//         }
-//       });
-//     }
-//   }
-// }
-
 function execEmailRequest(key, items, site, request) {
-  console.log("Executing request for " + key + " and site is " + site);
   request.execute(function(resp){
     items["trackedEmails"] = resp['resultSizeEstimate']
-    //console.log(emailTrack);
-    //console.log(resp);
-      // var site_re = new RegExp('.*?' + site + '.*?');
-      // var count = 0;
-      // //console.log('.*?' + site + '.*?');
-      // //console.log(items[key]['trackedEmails'][email]['spam']);
-      // if(resp['resultSizeEstimate'] != 0)
-      // {
-      //   var N = resp['resultSizeEstimate'];
-      //   items["trackedEmails"][email]['spam'] = 0;
-      //   for(var x = 0; x < N; x++)
-      //   {
-      //     var thisMessage = resp['messages'][x]['id'];
-      //     var request = gapi.client.gmail.users.messages.get({
-      //       'userId': 'me',
-      //       'id': thisMessage
-      //     });
-      //     request.execute(function(resp2) {
-      //       //console.log(resp2);
-      //       siteFrom = resp2['payload']['headers'][8];
-      //       for(var y = 0; y < 11; y++)
-      //       {
-      //         if(resp2['payload']['headers'][y]['name'] == 'From')
-      //         {
-      //           break;
-      //         }
-      //       }
-      //       var siteFrom = resp2['payload']['headers'][y]['value'];
-      //       //console.log(siteFrom);
-      //       if(site_re.test(siteFrom))
-      //       {
-      //         console.log('boom'); //shitty original test code.
-      //         //shouldn't do anything.
-      //       }
-      //       else
-      //       {
-      //         count += 1;
-      //         // spamNum = spamNum + 1; // update it in place. This requests run asynchronously.
-      //         var newObj = {};
-      //         console.log("MY ITEMS FOR SITE: " + site);
-      //         console.log(items);
-      //         console.log("the count");
-      //         console.log(count);
-      //         console.log('before: ' + items["trackedEmails"][email]["spam"] + " and site is: " + site);
-      //         items["trackedEmails"][email]["spam"] = count;
-      //         console.log('after: ' + items["trackedEmails"][email]["spam"]  + " and site is: " + site);
-      //         //items['trackedEmails'].push({'email': emailTrack, 'site': site, 'spam': spamNum})
-      //         newObj[key] = items;
-      //         console.log("my new obj:");
-      //         console.log(newObj);
-      //         // while(blocked) {
-      //         // }
-      //         // blocked = true;
-      //         chrome.storage.local.set(newObj,function(){
-      //           console.log('pls');
-      //           console.log("SAVED");
-      //           console.log(newObj);
-      //           // console.log('unblocking');
-      //           // blocked = false;
-      //         });
-      //       }
-      //     });
-      //   }
-      // }
   });
 }
 
@@ -355,19 +220,12 @@ function checkSpam()
   };
   gapi.client.load('gmail', 'v1', function() {
     chrome.storage.local.get(null, function(items) {
-      // var blocked = false;
       for(key in items)
       {
-        // updateForEmail(key, items[key]);
         var emails = items[key]['trackedEmails'];
         var len = items[key]['trackedEmails'].length;
-        // for(email in emails)
         var email = 0;
         while(len > 0) {
-        // for(var email = 0; email < len; email++)
-        // {
-          console.log(len);
-          console.log("INDEX " + email);
           if(emails[email]['track']) // obeying the checkbox shit.
           {
             var site = emails[email]['site'];
@@ -396,7 +254,6 @@ function verify() {
     'scope': 'https://www.googleapis.com/auth/gmail.readonly',
     'immediate': true
   };
-  //console.log('verify');
   gapi.auth.authorize(config, function() {
     checkSpam();
   });
